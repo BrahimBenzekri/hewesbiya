@@ -1,11 +1,15 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hewesbiya/data/mock_data.dart';
 import 'package:hewesbiya/core/location_service.dart';
+import 'package:hewesbiya/core/api_service.dart';
+import 'package:geolocator/geolocator.dart';
 
 
 class TourController extends ChangeNotifier {
   final MockTourService _service = MockTourService();
   final LocationService _locationService = LocationService();
+  final ApiService _apiService = ApiService();
   
   List<TourStop> _stops = [];
   int _currentIndex = 0;
@@ -17,6 +21,7 @@ class TourController extends ChangeNotifier {
   // Location Status
   bool _isLocationEnabled = false;
   bool _hasPermission = false;
+  StreamSubscription<Position>? _positionSubscription;
 
   // Getters
   TourStop? get currentStop => _stops.isNotEmpty ? _stops[_currentIndex] : null;
@@ -77,7 +82,22 @@ class TourController extends ChangeNotifier {
       if (_stops.isNotEmpty) {
         _currentCaption = "Arrived at ${_stops[0].name}. ${_stops[0].description}";
         _isSpeaking = true; // Simulate auto-play on arrival
-        notifyListeners();
+        // Send immediate location update to trigger backend
+        try {
+          final position = await _locationService.getCurrentPosition();
+          final audioBytes = await _apiService.sendLocationUpdate(
+            position.latitude, 
+            position.longitude
+          );
+          if (audioBytes != null) {
+            debugPrint("Received initial audio response: ${audioBytes.length} bytes");
+          }
+        } catch (e) {
+          debugPrint("Error sending initial location: $e");
+        }
+
+        // Start tracking location
+        _startLocationTracking();
         
         // Simulate speaking duration
         Future.delayed(const Duration(seconds: 3), () {
@@ -91,6 +111,22 @@ class TourController extends ChangeNotifier {
       _isLoading = false;
       notifyListeners();
     }
+  }
+
+  void _startLocationTracking() {
+    _positionSubscription?.cancel();
+    _positionSubscription = _locationService.getPositionStream().listen((position) async {
+      // Send location update to backend
+      final audioBytes = await _apiService.sendLocationUpdate(
+        position.latitude, 
+        position.longitude
+      );
+      
+      if (audioBytes != null) {
+        // TODO: Handle audio playback when Audio Player is implemented
+        debugPrint("Received audio response: ${audioBytes.length} bytes");
+      }
+    });
   }
 
   void nextStop() {
@@ -135,5 +171,11 @@ class TourController extends ChangeNotifier {
         notifyListeners();
       });
     });
+  }
+
+  @override
+  void dispose() {
+    _positionSubscription?.cancel();
+    super.dispose();
   }
 }

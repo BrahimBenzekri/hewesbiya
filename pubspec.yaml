@@ -10,8 +10,9 @@ dependencies:
   avatar_glow: ^3.0.1
   flutter:
     sdk: flutter
-  flutter_animate: ^4.5.2
-  geolocator: ^14.0.2
+  flutter_animate: ^4.5.0
+  geolocator: ^13.0.2
+  dio: ^5.4.0
   google_fonts: ^6.3.2
   provider: ^6.1.5+1
 
