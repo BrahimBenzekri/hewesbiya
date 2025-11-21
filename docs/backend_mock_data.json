@@ -1,0 +1,122 @@
+[
+  {
+    "id": "stop_001",
+    "name": "The Minaret (The Lighthouse of Algiers)",
+    "location": {
+      "lat": 36.732,
+      "lng": 3.142
+    },
+    "category": "World Record Architecture",
+    "era": "Modern (2019)",
+    "core_content": {
+      "history": "Standing at 265 meters, this is the tallest minaret in the world, surpassing the Hassan II Mosque. It serves not just as a call to prayer, but as a lighthouse guiding ships in the Bay of Algiers.",
+      "architecture": "The design fuses modern engineering with traditional Moorish style. It has 43 floors and houses a museum and research center.",
+      "atmosphere": "Majestic, vertigo-inducing, and dominating the skyline."
+    },
+    "secrets": [
+      "It is built to withstand a major earthquake of magnitude 9.0.",
+      "The top observation deck offers a view all the way to the Casbah."
+    ],
+    "tags": [
+      "World Record",
+      "Modern Marvel",
+      "Viewpoint"
+    ]
+  },
+  {
+    "id": "stop_002",
+    "name": "The Prayer Hall (Salle de Prière)",
+    "location": {
+      "lat": 36.733,
+      "lng": 3.143
+    },
+    "category": "Spiritual Center",
+    "era": "Modern",
+    "core_content": {
+      "history": "This massive hall can accommodate 120,000 worshippers. It is a feat of engineering, with a central dome that seems to float on light.",
+      "architecture": "The carpet alone is a masterpiece, designed with Algerian floral motifs. The chandeliers are made of Swarovski crystals.",
+      "atmosphere": "Serene, vast, and filled with a golden spiritual glow."
+    },
+    "secrets": [
+      "The central chandelier weighs 9.5 tons.",
+      "The calligraphy on the walls was carved by hand by local artisans."
+    ],
+    "tags": [
+      "Spirituality",
+      "Art",
+      "Interior Design"
+    ]
+  },
+  {
+    "id": "stop_003",
+    "name": "The Courtyard (The Sahn)",
+    "location": {
+      "lat": 36.734,
+      "lng": 3.144
+    },
+    "category": "Public Space",
+    "era": "Modern",
+    "core_content": {
+      "history": "A transitional space between the city and the sanctuary. It is designed to be a place of gathering and reflection before entering prayer.",
+      "architecture": "Lined with marble columns and fountains that echo the Alhambra in Granada.",
+      "atmosphere": "Bright, open, and rhythmic with the sound of water."
+    },
+    "secrets": [
+      "The geometric patterns on the floor point towards Mecca.",
+      "It uses a natural cooling system inspired by ancient desert palaces."
+    ],
+    "tags": [
+      "Architecture",
+      "Relaxation",
+      "Water Features"
+    ]
+  },
+  {
+    "id": "stop_004",
+    "name": "The Islamic Garden (Gardens of Paradise)",
+    "location": {
+      "lat": 36.735,
+      "lng": 3.145
+    },
+    "category": "Nature",
+    "era": "Modern",
+    "core_content": {
+      "history": "Inspired by the Quranic description of paradise, this garden features fruit trees, aromatic plants, and flowing streams.",
+      "architecture": "A grid layout typical of Persian and Andalusian gardens (Chahar Bagh).",
+      "atmosphere": "Fragrant, peaceful, and full of life."
+    },
+    "secrets": [
+      "Every tree species planted here is mentioned in the Quran.",
+      "It serves as a green lung for the surrounding urban area."
+    ],
+    "tags": [
+      "Nature",
+      "Botany",
+      "Peace"
+    ]
+  },
+  {
+    "id": "stop_005",
+    "name": "The Cultural Center & Library",
+    "location": {
+      "lat": 36.736,
+      "lng": 3.146
+    },
+    "category": "Knowledge Hub",
+    "era": "Modern",
+    "core_content": {
+      "history": "This mosque is not just for prayer; it is a university of knowledge. The library holds over 1 million books.",
+      "architecture": "Modern glass facades blended with wood lattice screens (Mashrabiya) to filter sunlight.",
+      "atmosphere": "Intellectual, quiet, and inspiring."
+    },
+    "secrets": [
+      "It contains a laboratory for restoring ancient manuscripts.",
+      "The digital archive is accessible to researchers worldwide."
+    ],
+    "tags": [
+      "Education",
+      "History",
+      "Research"
+    ]
+  }
+]
