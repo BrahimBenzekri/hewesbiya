@@ -31,7 +31,7 @@ class _TourView extends StatelessWidget {
         backgroundColor: Colors.transparent,
         elevation: 0,
         title: Text(
-          controller.currentStop?.name.toUpperCase() ?? "LOADING...",
+          controller.locationName.toUpperCase(),
           style: GoogleFonts.orbitron(
             fontSize: 16,
             fontWeight: FontWeight.bold,
@@ -41,12 +41,7 @@ class _TourView extends StatelessWidget {
         ),
         centerTitle: true,
         actions: [
-          if (controller.hasNext)
-            TextButton.icon(
-              onPressed: controller.nextStop,
-              icon: Icon(Icons.skip_next, color: theme.colorScheme.onSurface),
-              label: Text("SKIP", style: TextStyle(color: theme.colorScheme.onSurface)),
-            ),
+
         ],
       ),
       body: Stack(
