@@ -122,12 +122,18 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _handlePermissionRequest() async {
+    debugPrint('[_HomeScreenState] _handlePermissionRequest called');
     final status = await _locationService.requestLocation();
+    debugPrint('[_HomeScreenState] Permission status: $status');
+    
     if (status == LocationPermissionStatus.granted) {
+      debugPrint('[_HomeScreenState] Permission granted, restarting sequence');
       if (mounted) {
         Navigator.pop(context);
         _startConnectionSequence();
       }
+    } else {
+      debugPrint('[_HomeScreenState] Permission NOT granted: $status');
     }
   }
 
