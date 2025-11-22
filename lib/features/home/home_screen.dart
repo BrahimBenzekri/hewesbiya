@@ -258,93 +258,129 @@ class _HomeScreenState extends State<HomeScreen> {
 
           const SizedBox(height: 32),
 
-          // Did You Know Card
-          _buildDidYouKnowCard().animate().fadeIn(delay: 400.ms).scale(),
+          // Nearby Landmark Section
+          Text(
+            "NEARBY TOUR DETECTED",
+            style: GoogleFonts.orbitron(
+              fontSize: 12,
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).primaryColor,
+              letterSpacing: 1.5,
+            ),
+          ).animate().fadeIn(delay: 400.ms),
 
-          const SizedBox(height: 32),
+          const SizedBox(height: 16),
 
-          // Start Tour Button
-          SizedBox(
-            width: double.infinity,
-            height: 60,
-            child: ElevatedButton(
-              onPressed: () => Navigator.pushNamed(context, '/tour'),
-              style: ElevatedButton.styleFrom(
-                backgroundColor: Theme.of(context).primaryColor,
-                foregroundColor: Colors.white,
-                elevation: 8,
-                shadowColor: Theme.of(
-                  context,
-                ).primaryColor.withValues(alpha: 0.4),
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(20),
+          // Landmark Card
+          _buildLandmarkCard(context).animate().fadeIn(delay: 600.ms).scale(),
+
+          const SizedBox(height: 10),
+
+          // Did You Know Card (Secondary)
+          _buildDidYouKnowCard()
+              .animate()
+              .fadeIn(delay: 800.ms)
+              .slideY(begin: 0.2),
+        ],
+      ),
+    );
+  }
+
+  Widget _buildLandmarkCard(BuildContext context) {
+    return Container(
+      height: 340,
+      width: double.infinity,
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(30),
+        boxShadow: [
+          BoxShadow(
+            color: Colors.black.withValues(alpha: 0.2),
+            blurRadius: 20,
+            offset: const Offset(0, 10),
+          ),
+        ],
+      ),
+      child: ClipRRect(
+        borderRadius: BorderRadius.circular(30),
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            // Hero Image
+            Image.asset('assets/great_mosque_hero.jpeg', fit: BoxFit.cover),
+
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.1),
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
                 ),
               ),
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+            ),
+
+            // Content Overlay
+            Padding(
+              padding: const EdgeInsets.all(24.0),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisAlignment: MainAxisAlignment.end,
                 children: [
-                  const Icon(Icons.play_arrow_rounded, size: 32),
-                  const SizedBox(width: 12),
                   Text(
-                    "START TOUR",
-                    style: GoogleFonts.orbitron(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
-                      letterSpacing: 1.5,
+                    "The Great Mosque\nof Algiers",
+                    style: GoogleFonts.dmSerifDisplay(
+                      color: Colors.white,
+                      fontSize: 32,
+                      height: 1.1,
+                    ),
+                  ),
+                  const SizedBox(height: 8),
+                  Text(
+                    "A journey through faith and architecture.",
+                    style: GoogleFonts.inter(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: 14,
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  SizedBox(
+                    width: double.infinity,
+                    height: 56,
+                    child: ElevatedButton(
+                      onPressed: () => Navigator.pushNamed(context, '/tour'),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.white,
+                        foregroundColor: Colors.black,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                      ),
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: [
+                          const Text(
+                            "START EXPERIENCE",
+                            style: TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              letterSpacing: 0.5,
+                            ),
+                          ),
+                          const SizedBox(width: 8),
+                          const Icon(Icons.arrow_forward_rounded, size: 20),
+                        ],
+                      ),
                     ),
                   ),
                 ],
               ),
             ),
-          ).animate().fadeIn(delay: 600.ms).moveY(begin: 20, end: 0),
-
-          const SizedBox(height: 32),
-
-          // Quick Actions
-          Text(
-            "Quick Actions",
-            style: Theme.of(
-              context,
-            ).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
-          ).animate().fadeIn(delay: 800.ms),
-
-          const SizedBox(height: 16),
-
-          GridView.count(
-            shrinkWrap: true,
-            physics: const NeverScrollableScrollPhysics(),
-            crossAxisCount: 2,
-            mainAxisSpacing: 16,
-            crossAxisSpacing: 16,
-            childAspectRatio: 1.5,
-            children: [
-              _buildActionButton(
-                context,
-                Icons.map_outlined,
-                "Map View",
-                Colors.blue,
-              ),
-              _buildActionButton(
-                context,
-                Icons.bookmark_border_rounded,
-                "Saved",
-                Colors.orange,
-              ),
-              _buildActionButton(
-                context,
-                Icons.history_rounded,
-                "History",
-                Colors.purple,
-              ),
-              _buildActionButton(
-                context,
-                Icons.settings_outlined,
-                "Settings",
-                Colors.grey,
-              ),
-            ],
-          ).animate().fadeIn(delay: 1000.ms).slideY(begin: 0.2),
-        ],
+          ],
+        ),
       ),
     );
   }
@@ -396,59 +432,6 @@ class _HomeScreenState extends State<HomeScreen> {
                 style: Theme.of(
                   context,
                 ).textTheme.bodyMedium?.copyWith(height: 1.5),
-              ),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
-
-  Widget _buildActionButton(
-    BuildContext context,
-    IconData icon,
-    String label,
-    Color color,
-  ) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Theme.of(context).cardColor,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withValues(alpha: 0.03),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
-      ),
-      child: Material(
-        color: Colors.transparent,
-        child: InkWell(
-          borderRadius: BorderRadius.circular(20),
-          onTap: () {
-            ScaffoldMessenger.of(context).showSnackBar(
-              SnackBar(content: Text("$label feature coming soon!")),
-            );
-          },
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              Container(
-                padding: const EdgeInsets.all(12),
-                decoration: BoxDecoration(
-                  color: color.withValues(alpha: 0.1),
-                  shape: BoxShape.circle,
-                ),
-                child: Icon(icon, color: color, size: 28),
-              ),
-              const SizedBox(height: 12),
-              Text(
-                label,
-                style: const TextStyle(
-                  fontWeight: FontWeight.w600,
-                  fontSize: 14,
-                ),
               ),
             ],
           ),

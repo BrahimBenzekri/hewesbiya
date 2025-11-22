@@ -27,6 +27,7 @@ class _TourView extends StatelessWidget {
 
     return Scaffold(
       backgroundColor: theme.scaffoldBackgroundColor,
+      extendBodyBehindAppBar: true, // Allow gradient to show through AppBar
       appBar: AppBar(
         backgroundColor: Colors.transparent,
         elevation: 0,
@@ -48,12 +49,11 @@ class _TourView extends StatelessWidget {
           Positioned.fill(
             child: Container(
               decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.topCenter,
-                  end: Alignment.bottomCenter,
+                gradient: RadialGradient(
+                  center: Alignment.topLeft,
+                  radius: 1.5,
                   colors: [
-                    theme.scaffoldBackgroundColor,
-                    theme.primaryColor.withValues(alpha: 0.05),
+                    theme.colorScheme.secondary.withValues(alpha: 0.2),
                     theme.scaffoldBackgroundColor,
                   ],
                 ),
@@ -62,7 +62,10 @@ class _TourView extends StatelessWidget {
           ),
 
           // Content
-          if (controller.introText != null)
+          SafeArea(
+            child: Stack(
+              children: [
+                if (controller.introText != null)
             Center(
               child:
                   Text(
@@ -71,7 +74,7 @@ class _TourView extends StatelessWidget {
                         style: GoogleFonts.orbitron(
                           fontSize: 28,
                           fontWeight: FontWeight.bold,
-                          color: theme.primaryColor,
+                          color: theme.colorScheme.secondary, // Blue text
                           letterSpacing: 2.0,
                         ),
                       )
@@ -87,6 +90,48 @@ class _TourView extends StatelessWidget {
                       .then(delay: 1200.ms)
                       .fadeOut(duration: 400.ms),
             )
+          else if (!controller.isLocationReady)
+             Center(
+              child: Padding(
+                padding: const EdgeInsets.all(30.0),
+                child: Column(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Icon(
+                      Icons.location_off,
+                      size: 60,
+                      color: theme.colorScheme.error,
+                    ),
+                    const SizedBox(height: 20),
+                    Text(
+                      "Location Required",
+                      style: theme.textTheme.displaySmall,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 10),
+                    Text(
+                      controller.currentCaption,
+                      style: theme.textTheme.bodyLarge,
+                      textAlign: TextAlign.center,
+                    ),
+                    const SizedBox(height: 30),
+                    ElevatedButton.icon(
+                      onPressed: () => controller.loadTour(),
+                      icon: const Icon(Icons.refresh),
+                      label: const Text("Try Again / Grant Permission"),
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: theme.colorScheme.secondary, // Blue button
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(
+                          horizontal: 30,
+                          vertical: 15,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+              ),
+            )
           else
             Column(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -95,53 +140,50 @@ class _TourView extends StatelessWidget {
 
                 // AI Orb Visual
                 Center(
-                      child: AvatarGlow(
-                        animate:
-                            controller.isSpeaking || controller.isListening,
-                        glowColor: controller.isListening
-                            ? theme.colorScheme.secondary
-                            : theme.primaryColor,
-                        duration: const Duration(milliseconds: 2000),
-                        repeat: true,
-                        child: Material(
-                          elevation: 8.0,
-                          shape: const CircleBorder(),
-                          color: Colors.transparent,
-                          child: Container(
-                            width: 120,
-                            height: 120,
-                            decoration: BoxDecoration(
-                              shape: BoxShape.circle,
-                              color: theme.scaffoldBackgroundColor,
-                              border: Border.all(
-                                color: controller.isListening
-                                    ? theme.colorScheme.secondary
-                                    : theme.primaryColor,
-                                width: 2,
-                              ),
-                              boxShadow: [
-                                BoxShadow(
-                                  color:
-                                      (controller.isListening
-                                              ? theme.colorScheme.secondary
-                                              : theme.primaryColor)
-                                          .withValues(alpha: 0.6),
-                                  blurRadius: 20,
-                                  spreadRadius: 5,
-                                ),
-                              ],
-                            ),
-                            child: Icon(
-                              controller.isListening
-                                  ? Icons.mic
-                                  : Icons.graphic_eq,
-                              size: 50,
-                              color: theme.colorScheme.onSurface,
-                            ),
+                  child: AvatarGlow(
+                    animate: controller.isSpeaking || controller.isListening,
+                    glowColor: controller.isListening
+                        ? theme.primaryColor // Orange when listening
+                        : theme.colorScheme.secondary, // Blue when speaking/idle
+                    duration: const Duration(milliseconds: 2000),
+                    repeat: true,
+                    child: Material(
+                      elevation: 8.0,
+                      shape: const CircleBorder(),
+                      color: Colors.transparent,
+                      child: Container(
+                        width: 120,
+                        height: 120,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: theme.scaffoldBackgroundColor,
+                          border: Border.all(
+                            color: controller.isListening
+                                ? theme.primaryColor
+                                : theme.colorScheme.secondary,
+                            width: 2,
                           ),
+                          boxShadow: [
+                            BoxShadow(
+                              color:
+                                  (controller.isListening
+                                          ? theme.primaryColor
+                                          : theme.colorScheme.secondary)
+                                      .withValues(alpha: 0.6),
+                              blurRadius: 20,
+                              spreadRadius: 5,
+                            ),
+                          ],
+                        ),
+                        child: Icon(
+                          controller.isListening ? Icons.mic : Icons.graphic_eq,
+                          size: 50,
+                          color: theme.colorScheme.onSurface,
                         ),
                       ),
-                    )
+                    ),
+                  ),
+                )
                     .animate()
                     .scale(duration: 800.ms, curve: Curves.easeOutBack)
                     .fadeIn(duration: 600.ms),
@@ -203,6 +245,9 @@ class _TourView extends StatelessWidget {
                     ),
               ],
             ),
+              ],
+            ),
+          ),
         ],
       ),
     );
