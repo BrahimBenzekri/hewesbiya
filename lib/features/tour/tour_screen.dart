@@ -64,7 +64,24 @@ class _TourView extends StatelessWidget {
           ),
 
           // Content
-          if (controller.isLoading)
+          if (controller.introText != null)
+             Center(
+              child: Text(
+                controller.introText!,
+                textAlign: TextAlign.center,
+                style: GoogleFonts.orbitron(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: theme.primaryColor,
+                  letterSpacing: 2.0,
+                ),
+              ).animate(key: ValueKey(controller.introText)) // Re-run animation on text change
+               .fadeIn(duration: 400.ms)
+               .scale(begin: const Offset(0.8, 0.8), end: const Offset(1.0, 1.0), duration: 400.ms)
+               .then(delay: 1200.ms)
+               .fadeOut(duration: 400.ms),
+            )
+          else if (controller.isLoading)
             Center(
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,

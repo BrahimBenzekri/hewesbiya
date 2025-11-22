@@ -1,20 +1,20 @@
 import 'dart:developer';
-
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:hewesbiya/core/location_service.dart';
-import 'package:hewesbiya/core/api_service.dart';
 import 'package:geolocator/geolocator.dart';
+import 'package:audioplayers/audioplayers.dart';
 
 class TourController extends ChangeNotifier {
   final LocationService _locationService = LocationService();
-  final ApiService _apiService = ApiService();
+  final AudioPlayer _audioPlayer = AudioPlayer();
   
   String _locationName = "Locating...";
   bool _isLoading = true;
   bool _isListening = false;
   bool _isSpeaking = false;
   String _currentCaption = "Initializing tour...";
+  String? _introText; // If not null, show intro screen
   
   // Location Status
   bool _isLocationEnabled = false;
@@ -27,30 +27,28 @@ class TourController extends ChangeNotifier {
   bool get isListening => _isListening;
   bool get isSpeaking => _isSpeaking;
   String get currentCaption => _currentCaption;
+  String? get introText => _introText;
   bool get isLocationReady => _isLocationEnabled && _hasPermission;
 
   Future<bool> checkLocationRequirements() async {
+    // ... (keep existing checkLocationRequirements logic)
     log('[TourController] checkLocationRequirements() called');
     LocationPermissionStatus status = await _locationService.checkPermissionStatus();
-    log('[TourController] Permission status: $status');
-    
+    // ...
     _isLocationEnabled = status != LocationPermissionStatus.serviceDisabled;
     _hasPermission = status == LocationPermissionStatus.granted;
     
     if (status == LocationPermissionStatus.serviceDisabled) {
-      log('[TourController] Location services disabled');
       _currentCaption = "Location services are disabled.";
       notifyListeners();
       return false;
     }
 
     if (status == LocationPermissionStatus.denied) {
-      log('[TourController] Permission denied, requesting...');
       status = await _locationService.requestLocation();
       _hasPermission = status == LocationPermissionStatus.granted;
       
       if (status == LocationPermissionStatus.denied) {
-        log('[TourController] Permission denied after request');
         _currentCaption = "Location permission denied.";
         notifyListeners();
         return false;
@@ -58,13 +56,11 @@ class TourController extends ChangeNotifier {
     }
     
     if (status == LocationPermissionStatus.deniedForever) {
-      log('[TourController] Permission denied forever');
       _currentCaption = "Location permission permanently denied.";
       notifyListeners();
       return false;
     }
 
-    log('[TourController] Location requirements met');
     _hasPermission = true;
     notifyListeners();
     return true;
@@ -74,41 +70,55 @@ class TourController extends ChangeNotifier {
     log('[TourController] loadTour() called');
     _isLoading = true;
     notifyListeners();
+
+    // 1. Start Intro Sequence
+    await _playIntroSequence();
     
-    // Check location first
+    // 2. Check location
     if (!await checkLocationRequirements()) {
-      log('[TourController] Location requirements failed, aborting loadTour');
+      log('[TourController] Location requirements failed');
       _isLoading = false;
       notifyListeners();
       return;
     }
 
     try {
-      log('[TourController] Getting current position for initial update...');
-      // Send immediate location update to trigger backend
+      log('[TourController] Getting current position...');
       final position = await _locationService.getCurrentPosition();
-      log('[TourController] Initial position: ${position.latitude}, ${position.longitude}');
       await _handleLocationUpdate(position);
 
-      // Start tracking location
       _startLocationTracking();
       
     } catch (e) {
       log('[TourController] Error in loadTour: $e');
       _currentCaption = "Error connecting to tour service.";
-      debugPrint("Error in loadTour: $e");
     } finally {
       _isLoading = false;
       notifyListeners();
     }
   }
 
+  Future<void> _playIntroSequence() async {
+    final messages = [
+      "ARE YOU READY?",
+      "CONNECTING TO HISTORY...",
+      "LOADING YOUR EXPERIENCE..."
+    ];
+
+    for (final msg in messages) {
+      _introText = msg;
+      notifyListeners();
+      await Future.delayed(const Duration(seconds: 2));
+    }
+
+    _introText = null; // End intro
+    notifyListeners();
+  }
+
   void _startLocationTracking() {
     log('[TourController] Starting location tracking stream...');
     _positionSubscription?.cancel();
-    _positionSubscription = _locationService.getPositionStream().listen((
-      position,
-    ) async {
+    _positionSubscription = _locationService.getPositionStream().listen((position) async {
       log('[TourController] Stream received position: ${position.latitude}, ${position.longitude}');
       await _handleLocationUpdate(position);
     });
@@ -119,61 +129,46 @@ class TourController extends ChangeNotifier {
   Future<void> _handleLocationUpdate(Position position) async {
     log('[TourController] _handleLocationUpdate called with ${position.latitude}, ${position.longitude}');
     
-    // Debounce: Prevent requests within 2 seconds of the last one
+    // Debounce: Prevent requests within 5 seconds of the last one (longer for demo)
     if (_lastRequestTime != null && 
-        DateTime.now().difference(_lastRequestTime!) < const Duration(seconds: 2)) {
+        DateTime.now().difference(_lastRequestTime!) < const Duration(seconds: 5)) {
       log('[TourController] Debounced: Skipping update (too soon)');
       return;
     }
     _lastRequestTime = DateTime.now();
 
-    log('[TourController] Sending update to API...');
-    final response = await _apiService.sendLocationUpdate(
-      position.latitude, 
-      position.longitude
-    );
+    log('[TourController] Simulating API call...');
     
-    if (response != null) {
-      log('[TourController] API Response received: $response');
-      if (response['inside'] == true) {
-        log('[TourController] User is INSIDE');
-        _locationName = response['locationName'] ?? "Unknown Location";
-        _currentCaption = "You are at $_locationName";
-        notifyListeners();
+    // Simulate network delay
+    await Future.delayed(const Duration(seconds: 1));
 
-        final ttsUrl = response['ttsUrl'];
-        if (ttsUrl != null) {
-          log('[TourController] TTS URL found: $ttsUrl');
-          _isSpeaking = true;
+    // Mock Response Logic
+    log('[TourController] Simulating success response');
+    _locationName = "The Islamic Garden";
+    _currentCaption = "You are at $_locationName";
+    notifyListeners();
+
+    // Play Local Audio
+    if (!_isSpeaking) {
+      log('[TourController] Playing local audio: assets/ai_demo.mp3');
+      _isSpeaking = true;
+      notifyListeners();
+
+      try {
+        await _audioPlayer.play(AssetSource('ai_demo.mp3'));
+        
+        _audioPlayer.onPlayerComplete.listen((event) {
+          log('[TourController] Audio playback complete');
+          _isSpeaking = false;
           notifyListeners();
-          
-          // Fetch audio
-          log('[TourController] Fetching audio from $ttsUrl...');
-          final audioBytes = await _apiService.fetchAudio(ttsUrl);
-          if (audioBytes != null) {
-            log('[TourController] Audio received: ${audioBytes.length} bytes');
-            debugPrint("Received audio: ${audioBytes.length} bytes");
-            // TODO: Play audio
-          } else {
-            log('[TourController] Audio fetch failed (bytes null)');
-          }
-          
-          // Simulate speaking end for now
-          Future.delayed(const Duration(seconds: 3), () {
-            _isSpeaking = false;
-            notifyListeners();
-          });
-        } else {
-          log('[TourController] No TTS URL in response');
-        }
-      } else {
-        log('[TourController] User is OUTSIDE');
-        _locationName = "Exploring...";
-        _currentCaption = "Move closer to a landmark.";
+        });
+      } catch (e) {
+        log('[TourController] Error playing audio: $e');
+        _isSpeaking = false;
         notifyListeners();
       }
     } else {
-      log('[TourController] API Response was NULL');
+      log('[TourController] Already speaking, skipping playback');
     }
   }
 
@@ -204,6 +199,7 @@ class TourController extends ChangeNotifier {
   @override
   void dispose() {
     _positionSubscription?.cancel();
+    _audioPlayer.dispose();
     super.dispose();
   }
 }
