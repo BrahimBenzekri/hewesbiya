@@ -8,14 +8,14 @@ import 'package:audioplayers/audioplayers.dart';
 class TourController extends ChangeNotifier {
   final LocationService _locationService = LocationService();
   final AudioPlayer _audioPlayer = AudioPlayer();
-  
+
   String _locationName = "Locating...";
   bool _isLoading = true;
   bool _isListening = false;
   bool _isSpeaking = false;
   String _currentCaption = "Initializing tour...";
   String? _introText; // If not null, show intro screen
-  
+
   // Location Status
   bool _isLocationEnabled = false;
   bool _hasPermission = false;
@@ -33,11 +33,12 @@ class TourController extends ChangeNotifier {
   Future<bool> checkLocationRequirements() async {
     // ... (keep existing checkLocationRequirements logic)
     log('[TourController] checkLocationRequirements() called');
-    LocationPermissionStatus status = await _locationService.checkPermissionStatus();
+    LocationPermissionStatus status = await _locationService
+        .checkPermissionStatus();
     // ...
     _isLocationEnabled = status != LocationPermissionStatus.serviceDisabled;
     _hasPermission = status == LocationPermissionStatus.granted;
-    
+
     if (status == LocationPermissionStatus.serviceDisabled) {
       _currentCaption = "Location services are disabled.";
       notifyListeners();
@@ -47,14 +48,14 @@ class TourController extends ChangeNotifier {
     if (status == LocationPermissionStatus.denied) {
       status = await _locationService.requestLocation();
       _hasPermission = status == LocationPermissionStatus.granted;
-      
+
       if (status == LocationPermissionStatus.denied) {
         _currentCaption = "Location permission denied.";
         notifyListeners();
         return false;
       }
     }
-    
+
     if (status == LocationPermissionStatus.deniedForever) {
       _currentCaption = "Location permission permanently denied.";
       notifyListeners();
@@ -73,7 +74,7 @@ class TourController extends ChangeNotifier {
 
     // 1. Start Intro Sequence
     await _playIntroSequence();
-    
+
     // 2. Check location
     if (!await checkLocationRequirements()) {
       log('[TourController] Location requirements failed');
@@ -88,7 +89,6 @@ class TourController extends ChangeNotifier {
       await _handleLocationUpdate(position);
 
       _startLocationTracking();
-      
     } catch (e) {
       log('[TourController] Error in loadTour: $e');
       _currentCaption = "Error connecting to tour service.";
@@ -99,11 +99,7 @@ class TourController extends ChangeNotifier {
   }
 
   Future<void> _playIntroSequence() async {
-    final messages = [
-      "ARE YOU READY?",
-      "CONNECTING TO HISTORY...",
-      "LOADING YOUR EXPERIENCE..."
-    ];
+    final messages = ["ARE YOU READY?", "LOADING YOUR EXPERIENCE..."];
 
     for (final msg in messages) {
       _introText = msg;
@@ -118,8 +114,12 @@ class TourController extends ChangeNotifier {
   void _startLocationTracking() {
     log('[TourController] Starting location tracking stream...');
     _positionSubscription?.cancel();
-    _positionSubscription = _locationService.getPositionStream().listen((position) async {
-      log('[TourController] Stream received position: ${position.latitude}, ${position.longitude}');
+    _positionSubscription = _locationService.getPositionStream().listen((
+      position,
+    ) async {
+      log(
+        '[TourController] Stream received position: ${position.latitude}, ${position.longitude}',
+      );
       await _handleLocationUpdate(position);
     });
   }
@@ -127,18 +127,21 @@ class TourController extends ChangeNotifier {
   DateTime? _lastRequestTime;
 
   Future<void> _handleLocationUpdate(Position position) async {
-    log('[TourController] _handleLocationUpdate called with ${position.latitude}, ${position.longitude}');
-    
+    log(
+      '[TourController] _handleLocationUpdate called with ${position.latitude}, ${position.longitude}',
+    );
+
     // Debounce: Prevent requests within 5 seconds of the last one (longer for demo)
-    if (_lastRequestTime != null && 
-        DateTime.now().difference(_lastRequestTime!) < const Duration(seconds: 5)) {
+    if (_lastRequestTime != null &&
+        DateTime.now().difference(_lastRequestTime!) <
+            const Duration(seconds: 5)) {
       log('[TourController] Debounced: Skipping update (too soon)');
       return;
     }
     _lastRequestTime = DateTime.now();
 
     log('[TourController] Simulating API call...');
-    
+
     // Simulate network delay
     await Future.delayed(const Duration(seconds: 1));
 
@@ -156,7 +159,7 @@ class TourController extends ChangeNotifier {
 
       try {
         await _audioPlayer.play(AssetSource('ai_demo.mp3'));
-        
+
         _audioPlayer.onPlayerComplete.listen((event) {
           log('[TourController] Audio playback complete');
           _isSpeaking = false;
