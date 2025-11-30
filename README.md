@@ -2,6 +2,9 @@
 
 **7ewesbiya** is a smart cultural guide application designed to enhance your travel experience. Explore cultural landmarks, get real-time recommendations, and enjoy interactive tours with our modern and intuitive mobile app.
 
+> [!NOTE]
+> This project was developed as part of the **Djezzy InnovTech Hackathon**.
+
 ## Features
 
 -   **Interactive Cultural Tours**: Discover hidden gems and popular landmarks with guided tours.
