@@ -147,7 +147,7 @@ class TourController extends ChangeNotifier {
 
     // Mock Response Logic
     log('[TourController] Simulating success response');
-    _locationName = "The Islamic Garden";
+    _locationName = "The Main Entrance";
     _currentCaption = "You are at $_locationName";
     notifyListeners();
 
